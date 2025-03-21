@@ -40,7 +40,7 @@ public class UserDaoImpl implements UserDao {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        namedParameterJdbcTemplate.update(sql ,new MapSqlParameterSource(map), keyHolder);
+        namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(map), keyHolder);
 
         int userId = keyHolder.getKey().intValue();
 
@@ -54,6 +54,23 @@ public class UserDaoImpl implements UserDao {
 
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userId);
+
+        List<User> userList = namedParameterJdbcTemplate.query(sql, map, new UserRowMapper());
+
+        if (userList != null && userList.size() > 0) {
+            return userList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        String sql = "SELECT user_id, email, password, created_date, last_modified_date " +
+                "FROM user WHERE email = :email";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("email", email);
 
         List<User> userList = namedParameterJdbcTemplate.query(sql, map, new UserRowMapper());
 
